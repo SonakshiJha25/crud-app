@@ -4,7 +4,7 @@ const app = express();
 const PORT = 3000;
 
 app.use(bodyParser.json());
-app.use(express.static("public")); // serve frontend
+app.use(express.static("public")); 
 
 let items = [];
 let id = 1;
