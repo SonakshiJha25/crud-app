@@ -304,7 +304,6 @@ function displayItems(list) {
       const targetIndex = index;
       if (draggedItem === null || draggedItem === targetIndex) return;
 
-      // Swap items in the array
       const temp = items[draggedItem];
       items[draggedItem] = items[targetIndex];
       items[targetIndex] = temp;
@@ -314,7 +313,6 @@ function displayItems(list) {
   });
 }
 
-// Add item function
 async function addItem() {
   const name = itemInput.value.trim();
   if (!name) return;
