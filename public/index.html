@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CRUD App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      background: #ffffff;
+      color: #333;
+      text-align: center; /* Center all inline content */
+    }
+    h1 {
+      color: #004aad;
+    }
+    #inputContainer {
+      margin-bottom: 20px;
+    }
+    input, button {
+      padding: 8px;
+      margin: 5px;
+      border: 1px solid #004aad;
+      border-radius: 4px;
+    }
+    button {
+      background: #004aad;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      opacity: 0.9;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      margin: 10px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center; /* Center the list items horizontally */
+      gap: 10px;
+    }
+    .item-name {
+      flex: 1;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <h1>CRUD Application</h1>
+
+  <div id="inputContainer">
+    <input type="text" id="itemInput" placeholder="Enter item">
+    <button onclick="addItem()">Add</button>
+  </div>
+
+  <ul id="itemList"></ul>
+
+  <script>
+    async function fetchItems() {
+      const res = await fetch("/items");
+      const items = await res.json();
+      const list = document.getElementById("itemList");
+      list.innerHTML = "";
+      items.forEach(item => {
+        const li = document.createElement("li");
+
+        const span = document.createElement("span");
+        span.className = "item-name";
+        span.innerText = item.name;
+
+        const editBtn = document.createElement("button");
+        editBtn.innerText = "Edit";
+        editBtn.onclick = async () => {
+          const newName = prompt("Enter new name:", item.name);
+          if (newName) {
+            await fetch(`/items/${item.id}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ name: newName })
+            });
+            fetchItems();
+          }
+        };
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.innerText = "Delete";
+        deleteBtn.onclick = async () => {
+          await fetch(`/items/${item.id}`, { method: "DELETE" });
+          fetchItems();
+        };
+
+        li.appendChild(span);
+        li.appendChild(editBtn);
+        li.appendChild(deleteBtn);
+        list.appendChild(li);
+      });
+    }
+
+    async function addItem() {
+      const input = document.getElementById("itemInput");
+      const name = input.value.trim();
+      if (name) {
+        await fetch("/items", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name })
+        });
+        input.value = "";
+        fetchItems();
+      }
+    }
+
+    // Add item on pressing Enter key
+    document.getElementById("itemInput").addEventListener("keypress", function(e) {
+      if (e.key === "Enter") {
+        addItem();
+      }
+    });
+
+    fetchItems();
+  </script>
+</body>
+</html>
